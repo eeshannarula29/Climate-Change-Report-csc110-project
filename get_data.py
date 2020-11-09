@@ -79,7 +79,7 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
     # creating the file to store data in
     filename = '_'.join(get_tags(hashtags)) + '.csv'
 
-    with open(filename) as file:
+    with open(filename, 'w', newline='') as file:
         write = csv.writer(file)
 
         # add column names, as the first row of the dataset we would create
@@ -120,9 +120,19 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
                 tweet.retweet_count,  # number of times this tweet has been retweeted
                 tweet.created_at,  # the date and time of creation
                 tweet.user.screen_name,  # username of the user
-                tweet.followers_count,  # number of followers the user has
+                tweet.user.followers_count,  # number of followers the user has
                 tweet.user.location  # location of the user
             ])
 
 
+if __name__ == '__main__':
+    items_per_tag = 2
+
+    for tag in tags:
+        search_for_query(keys['consumer_key'],
+                         keys['consumer_key_secret'],
+                         keys['Access_token'],
+                         keys['Access_token_secret'],
+                         [tag],
+                         items_per_tag)
 
