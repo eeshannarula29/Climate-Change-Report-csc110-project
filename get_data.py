@@ -25,7 +25,7 @@ keys = {'consumer_key': 'oYpwnrbV5Y9ALcdwdQhRkSsLR',
 
 tags = ['#climatechange',
         '#climatechangeisreal',
-        '#actonclimate',
+        '#actonclimate'
         '#globalwarming',
         '#climatechangehoax',
         '#climatedeniers',
@@ -34,18 +34,8 @@ tags = ['#climatechange',
         '#climatechangenotreal']
 
 
-def get_tags(hashtags: List[str]) -> List[str]:
-    """Return a list of all the hashtags in the string
-
-    >>> get_tags(['#climatechange', '#climatechangeisreal'])
-    ['climatechange', 'climatechangeisreal']
-    """
-
-    return [word[1:] for word in hashtags]
-
-
 def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: str, access_token_secret: str,
-                     hashtags: List[str], items: int) -> None:
+                     hashtags: List[str], max_items: int) -> None:
     """
     This function will get us the most recant <items> tweets on the hashtags we give the function in the form of
     a search query. Here we use the tweepy api to extract these tweets and write all these tweets on csv. We can
@@ -58,7 +48,7 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
     @param access_token: A unique key for our project/app assigned by twitter for authentication
     @param access_token_secret: A unique key for our project/app assigned by twitter for authentication
     @param hashtags: A list of strings containing all the hashtags for which we want to get tweets
-    @param items: The number of tweets we want from the most latest tweet
+    @param max_items: The maximum number of tweets we want starting from the most latest tweet
     @return: None
 
     Preconditions:
@@ -74,10 +64,10 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
     auth.set_access_token(access_token, access_token_secret)
 
     # initializing API used to do access all the function in the library
-    api = tweepy.API(auth)
+    api = tweepy.API(auth, wait_on_rate_limit=True)
 
     # creating the file to store data in
-    filename = '_'.join(get_tags(hashtags)) + '.csv'
+    filename = 'climate-change' + '.csv'
 
     with open(filename, 'w', newline='') as file:
         write = csv.writer(file)
@@ -109,7 +99,7 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
 
         # extracting tweets in a list.
         # tweets here is a list of tweet objects which contains all the information about a tweet
-        tweets = tweepy.Cursor(api.search, q=search_query, lang=language, tweet_mode=mode).items(items)
+        tweets = tweepy.Cursor(api.search, q=search_query, lang=language, tweet_mode=mode).items(max_items)
 
         # extracting out the features we want from the tweets and writing them into csv file
         for tweet in tweets:
@@ -126,13 +116,11 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
 
 
 if __name__ == '__main__':
-    items_per_tag = 2
 
-    for tag in tags:
-        search_for_query(keys['consumer_key'],
-                         keys['consumer_key_secret'],
-                         keys['Access_token'],
-                         keys['Access_token_secret'],
-                         [tag],
-                         items_per_tag)
+    search_for_query(consumer_key=keys['consumer_key'],
+                     consumer_key_secret=keys['consumer_key_secret'],
+                     access_token=keys['Access_token'],
+                     access_token_secret=keys['Access_token_secret'],
+                     hashtags=tags,
+                     max_items=3000)
 
