@@ -9,44 +9,10 @@ References:
 """
 
 # import libraries
-from dataclasses import dataclass
-from typing import List, Dict
 from datetime import datetime
+from typing import Dict
 import csv
 import ast
-
-
-@dataclass
-class Tweet:
-    """
-    Tweet datatype represents a tweet in the dataset we have
-    with all its information.
-
-    Instance Attributes:
-    - text: text of the tweet
-    - score: sentiment score of the tweet
-    - hashtags: list of hashtags in mentioned in the tweet
-    - likes: number of likes on the tweet
-    - retweet: the number of times the tweet was retweeted
-    - timestamp: date and time when the tweet was posted
-    - username: username of the person who posted the tweet
-    - followers: number of followers the user has
-    - location: user's location
-
-    Representation Invariants:
-      - self.likes >= 0
-      - self.retweets >= 0
-      - self.followers >= 0
-    """
-    text: str
-    score: float
-    hashtags: List[Dict]
-    likes: int
-    retweets: int
-    timestamp: datetime
-    username: str
-    followers: int
-    location: str
 
 
 def add_sentiments_to_data(filename: str, words_list: str) -> None:
