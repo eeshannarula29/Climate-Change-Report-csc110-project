@@ -5,7 +5,7 @@ column for the sentiment score of the tweet, based
 on dataset of collection of words we have
 
 References:
-    
+
 """
 
 # import libraries
