@@ -67,7 +67,7 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
     # creating the file to store data in
-    filename = 'climate-change' + '.csv'
+    filename = 'dataset/climate-change.csv'
 
     with open(filename, 'w', newline='') as file:
         write = csv.writer(file)
