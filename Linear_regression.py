@@ -117,7 +117,7 @@ def compute_gradients(xs: List[float], ys: List[float], weight: float, bias: flo
 
 
 # step4: Repeat step 2 to 4, and train our model
-def train(xs: List[float], ys: List[float], epochs: int, alpha: float, minmax: List[int]) -> list:
+def train(xs: List[float], ys: List[float], epochs: int, alpha: float, minmax: List[int], callback=None) -> list:
     """The function would calculate the gradients of the randomly initialized weight and bias
     and change them according to the gradient and the learning rate. This process is repeated
     <epochs> times, and return the trained weights. The aim is to reduce the cost of these
@@ -128,6 +128,7 @@ def train(xs: List[float], ys: List[float], epochs: int, alpha: float, minmax: L
     :param epochs: The number of times we want to train our model
     :param alpha: the learning rate with which we want to learn
     :param minmax: list containing the range of random initial weight and bias: [min, max]
+    :param callback: a function that would be called after every epoch
     :return: The weight and bias of the trained model, and a list of cost after every epoch
     """
 
@@ -149,6 +150,9 @@ def train(xs: List[float], ys: List[float], epochs: int, alpha: float, minmax: L
         cost = compute_cost(xs, ys, weight, bias)
 
         history.append(cost)
+
+        if callback:
+            callback(weight, bias, history)
 
     return [weight, bias, history]
 
