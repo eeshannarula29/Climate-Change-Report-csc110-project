@@ -86,7 +86,8 @@ def compute_cost(xs: List[float], ys: List[float], weight: float, bias: float) -
     """
 
     # compute the average squared difference in the predicted and actual values
-    sq_avg = sum(pow(predict(xs[i], weight, bias) - ys[i], 2) for i in range(len(xs))) / len(xs)
+    sq_avg = sum(pow(predict(xs[i], weight, bias) - ys[i], 2)
+                 for i in range(len(xs))) / len(xs)
 
     # we return our answer divided by 2 because of computational purposes
     return sq_avg / 2
@@ -152,7 +153,7 @@ def train(xs: List[float], ys: List[float], epochs: int, alpha: float, minmax: L
         history.append(cost)
 
         if callback:
-            callback(weight, bias, history)
+            callback([weight, bias, history])
 
     return [weight, bias, history]
 
@@ -169,18 +170,52 @@ def plot_statistics(xs: List[float], ys: List[float], weight: float, bias: float
     :return: None
     """
 
-    fig, axs = plt.subplots(2)
-
     # plot the data points and line
-    axs[0].scatter(xs, ys)
-    axs[0].xlabel('x')
-    axs[0].ylabel('y')
+    plt.figure(1)
+    plt.scatter(xs, ys)
+    plt.xlabel('x')
+    plt.ylabel('y')
 
     predicted_values = [predict(i, weight, bias) for i in xs]
 
-    axs[0].plot(xs, predicted_values, color='r')
+    plt.plot(xs, predicted_values, color='r')
 
     # plot the cost function with epochs
-    axs[1].plot(list(range(len(history))), history)
+    plt.figure(2)
+    plt.plot(list(range(len(history))), history)
+    plt.xlabel('epochs')
+    plt.ylabel('cost')
 
     plt.show()
+
+
+def run_demo() -> None:
+    """
+    The function would run a demo training session on sample data
+
+    :return: None
+    """
+
+    import numpy as np
+
+    # generating data
+    xs = np.random.rand(100, 1)
+    ys = 2 + 3 * xs + np.random.rand(100, 1)
+
+    # covert to list
+    xs, ys = [i[0] for i in xs], [i[0] for i in ys]
+
+    # defining attributes to the train function
+    epochs = 1000
+    learning_rate = 0.1
+    initial_range = [-5, 5]
+
+    # train model
+    weight, bias, history = train(xs, ys, epochs, learning_rate, initial_range)
+
+    # plot graphs
+    plot_statistics(xs, ys, weight, bias, history)
+
+
+if __name__ == "__main__":
+    run_demo()
