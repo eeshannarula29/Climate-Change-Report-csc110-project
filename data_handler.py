@@ -7,9 +7,27 @@ from typing import List
 import csv
 
 
-def read_csv(filepath: str, types: list) -> List[List[str]]:
+def read_csv(filepath: str) -> List[List[str]]:
     """Return a List rows of csv file, where every row
     is a list, with all variables in string format.
+
+    @param filepath: the path of the csv file
+    @return: List of rows in the csv file
+    """
+
+    with open(filepath) as file:
+        reader = csv.reader(file)
+
+        next(reader)  # skip the header row
+
+        data = [row for row in reader]
+
+        return data
+
+
+def read_csv_and_transform(filepath: str, types: list) -> List[List[str]]:
+    """Return a List rows of csv file, where every row
+    is a list, with all variables in their respective datatype
 
     @param filepath: the path of the csv file
     @param types: list of datatype objects corresponding to each variable in list
