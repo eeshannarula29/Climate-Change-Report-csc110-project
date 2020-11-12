@@ -211,10 +211,10 @@ def run_demo() -> None:
     initial_range = [-5, 5]
 
     # train model
-    weight, bias, history = train(xs, ys, epochs, learning_rate, initial_range)
+    slope, intercept, history = train(xs, ys, epochs, learning_rate, initial_range)
 
     # plot graphs
-    plot_statistics(xs, ys, weight, bias, history)
+    plot_statistics(xs, ys, slope, intercept, history)
 
 
 if __name__ == "__main__":
