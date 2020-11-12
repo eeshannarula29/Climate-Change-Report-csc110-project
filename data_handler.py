@@ -69,21 +69,21 @@ def convert_datatype(values: list, types: list) -> list:
     return list_so_far
 
 
-def filter_dataset_by_feature(dataset: List[List], column: int, filter_function):
+def filter_by_value(dataset: List[List], column: int, values: list):
     """
     Return a filtered dataset, with rows in which column <column>
-    satisfies the predicate function filter_function
+    has a value in <value> list
 
     @param dataset: the dataset we want to filter
     @param column: the column with which we want to filter
-    @param filter_function: the predicate function used for filtering
+    @param values: the list of values with column could have
     @return: A filtered dataset
     """
 
-    return [row for row in dataset if filter_function(row[column])]
+    return [row for row in dataset if row[column] in values]
 
 
-def filter_dataset(dataset: List[List], filter_function):
+def filter_by_function(dataset: List[List], filter_function):
     """
     Return a filtered dataset, with rows that satisfies the
     predicate function filter_function
@@ -109,7 +109,7 @@ def remove_na(dataset: List[List]) -> List[List]:
     @param dataset: the dataset we want to filter
     @return: A filtered dataset
     """
-    return filter_dataset(dataset, __remove_na_for_row__)
+    return filter_by_function(dataset, __remove_na_for_row__)
 
 
 def select(dataset: List[List], selected_columns: List[int]) -> List[List]:
