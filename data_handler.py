@@ -7,7 +7,7 @@ from typing import List
 import csv
 
 
-def read_csv(filepath: str, types: list) -> List[List[str], List[List[str]]]:
+def read_csv(filepath: str, types: list) -> List[List[str]]:
     """Return a List rows of csv file, where every row
     is a list, with all variables in string format.
 
@@ -19,11 +19,11 @@ def read_csv(filepath: str, types: list) -> List[List[str], List[List[str]]]:
     with open(filepath) as file:
         reader = csv.reader(file)
 
-        header = next(reader)  # the header row
+        next(reader)  # skip the header row
 
         data = [convert_datatype(row, types) for row in reader]
 
-        return [header, data]
+        return data
 
 
 def convert_to_datetime(dt: str) -> datetime:
@@ -43,8 +43,8 @@ def convert_datatype(values: list, types: list) -> list:
     into the appropriate datatype passed in the types.
 
     Appropriate types:
-    - string
-    - integer
+    - str
+    - int
     - float
     - datetime
     - bool
@@ -100,7 +100,7 @@ def __remove_na_for_row__(row: list) -> bool:
     """Return whether any of the values in the list
     is an empty string or None"""
 
-    return any(element is None or element == '' for element in row)
+    return any(element is not None and element != '' for element in row)
 
 
 def remove_na(dataset: List[List]) -> List[List]:
@@ -132,3 +132,13 @@ def delete(dataset: List[List], selected_columns: List[int]) -> List[List]:
     """
 
     return [[row[column] for column in range(len(row)) if column not in selected_columns] for row in dataset]
+
+
+def head(dataset: List[List], n=5) -> None:
+    """Print the first <n> rows of a dataset"""
+
+    for i in range(n):
+        print(dataset[i])
+
+
+
