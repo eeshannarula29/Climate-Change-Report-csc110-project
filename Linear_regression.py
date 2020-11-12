@@ -78,11 +78,11 @@ def compute_cost(xs: List[float], ys: List[float], weight: float, bias: float) -
     Return the cost of the model by calculating the average squared difference in the
     predicted and actual values
 
-    :param xs: list of values of predictor variable of our model
-    :param ys: list of values of dependent variable corresponding to the values in xs
-    :param weight: the slope of the model or line
-    :param bias: the intercept of the model or line
-    :return: the cost of the model
+    @param xs: list of values of predictor variable of our model
+    @param ys: list of values of dependent variable corresponding to the values in xs
+    @param weight: the slope of the model or line
+    @param bias: the intercept of the model or line
+    @return: the cost of the model
     """
 
     # compute the average squared difference in the predicted and actual values
@@ -101,11 +101,11 @@ def compute_gradients(xs: List[float], ys: List[float], weight: float, bias: flo
     prediction. These deltas are called gradients and are calculated by computing
     the partial derivative of the cost function with respect to the weight and bias.
 
-    :param xs: list of values of predictor variable of our model
-    :param ys: list of values of dependent variable corresponding to the values in xs
-    :param weight: weight: the slope of the model or line
-    :param bias: bias: the intercept of the model or line
-    :return: gradients for weight and bias of the line
+    @param xs: list of values of predictor variable of our model
+    @param ys: list of values of dependent variable corresponding to the values in xs
+    @param weight: weight: the slope of the model or line
+    @param bias: bias: the intercept of the model or line
+    @return: gradients for weight and bias of the line
     """
 
     d_bias = sum([(predict(xs[i], weight, bias) - ys[i])
@@ -124,13 +124,13 @@ def train(xs: List[float], ys: List[float], epochs: int, alpha: float, minmax: L
     <epochs> times, and return the trained weights. The aim is to reduce the cost of these
     parameters.
 
-    :param xs: list of values of predictor variable of our model
-    :param ys: list of values of dependent variable corresponding to the values in xs
-    :param epochs: The number of times we want to train our model
-    :param alpha: the learning rate with which we want to learn
-    :param minmax: list containing the range of random initial weight and bias: [min, max]
-    :param callback: a function that would be called after every epoch
-    :return: The weight and bias of the trained model, and a list of cost after every epoch
+    @param xs: list of values of predictor variable of our model
+    @param ys: list of values of dependent variable corresponding to the values in xs
+    @param epochs: The number of times we want to train our model
+    @param alpha: the learning rate with which we want to learn
+    @param minmax: list containing the range of random initial weight and bias: [min, max]
+    @param callback: a function that would be called after every epoch
+    @return: The weight and bias of the trained model, and a list of cost after every epoch
     """
 
     # step 1: initialize weights and biases randomly
@@ -162,12 +162,12 @@ def plot_statistics(xs: List[float], ys: List[float], weight: float, bias: float
     """
     Plot the line and the data-points in one plot and cost on another plot
 
-    :param xs: list of values of predictor variable of our model
-    :param ys: list of values of dependent variable corresponding to the values in xs
-    :param weight: weight of the model
-    :param bias: bias of the model
-    :param history: list of cost per epoch
-    :return: None
+    @param xs: list of values of predictor variable of our model
+    @param ys: list of values of dependent variable corresponding to the values in xs
+    @param weight: weight of the model
+    @param bias: bias of the model
+    @param history: list of cost per epoch
+    @return: None
     """
 
     # plot the data points and line
