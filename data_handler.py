@@ -3,7 +3,7 @@ This file will be used to handle all the data
 """
 
 from datetime import datetime
-from typing import List
+from typing import List, Dict
 import csv
 
 
@@ -159,4 +159,36 @@ def head(dataset: List[List], n=5) -> None:
         print(dataset[i])
 
 
+def unique(dataset: List[List], column: int) -> set:
+    """Return a list of unique values for the column <column> in dataset"""
+    return {row[column] for row in dataset}
+
+
+def group_by(dataset: List[List], column: int, filter_values=None) -> Dict[str, List[List]]:
+    """Group the data by different values of the column <column> and return an list
+    with lists of observations for a specific value of the column.
+
+    @param dataset: the dataset we want to filter
+    @param column: the column number to group by
+    @param filter_values: set of values for column we want to keep
+    @return: dict containing datasets with different values for the column
+    """
+
+    values_to_keep = unique(dataset, column)
+
+    if filter_values:
+        values_to_keep = values_to_keep.intersection(filter_values)
+
+    dict_so_far = {value: [] for value in values_to_keep}
+
+    for row in dataset:
+        if row[column] in dict_so_far:
+            dict_so_far[row[column]].append(row)
+
+    return dict_so_far
+
+
+def extract_column(dataset: List[List], column: int) -> list:
+    """Return a column of a dataset"""
+    return [row[column] for row in dataset]
 
