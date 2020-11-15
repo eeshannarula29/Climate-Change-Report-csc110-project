@@ -44,6 +44,18 @@ def read_csv_and_transform(filepath: str, types: list) -> List[List[str]]:
         return data
 
 
+def transform(dataset: List[List], types: list, year_only: bool = False) -> List[List]:
+    """Return a dataset with all the variables in their appropriate
+    data type.
+
+    :param year_only: if we just want the year from datetime object
+    :param dataset: the dataset for which we want to apply this function
+    :param types: list of datatype objects
+    :return: dataset with variables having appropriate datatype
+    """
+    return [convert_datatype(row, types, year_only) for row in dataset]
+
+
 def convert_to_datetime(dt: str) -> datetime:
     """Convert a string to datetime format and
     return datetime object
@@ -55,7 +67,7 @@ def convert_to_datetime(dt: str) -> datetime:
     return datetime.fromisoformat(dt)
 
 
-def convert_datatype(values: list, types: list) -> list:
+def convert_datatype(values: list, types: list, only_year: bool = False) -> list:
     """
     Returns a list with every element of the list converted
     into the appropriate datatype passed in the types.
@@ -69,6 +81,7 @@ def convert_datatype(values: list, types: list) -> list:
 
     @param values: row of a dataset
     @param types: type to change each value in the row
+    @param only_year: if we just want the year from datetime object
     @return: list with each value having appropriate dataset
 
     Preconditions:
@@ -82,7 +95,10 @@ def convert_datatype(values: list, types: list) -> list:
             list_so_far.append(types[index](values[index]))
 
         else:
-            list_so_far.append(convert_to_datetime(values[index]))
+            if only_year:
+                list_so_far.append(convert_to_datetime(values[index]).year)
+            else:
+                list_so_far.append(convert_to_datetime(values[index]))
 
     return list_so_far
 
@@ -118,7 +134,7 @@ def __remove_na_for_row__(row: list) -> bool:
     """Return whether any of the values in the list
     is an empty string or None"""
 
-    return any(element is not None and element != '' for element in row)
+    return all(element is not None and element != '' for element in row)
 
 
 def remove_na(dataset: List[List]) -> List[List]:
@@ -188,7 +204,34 @@ def group_by(dataset: List[List], column: int, filter_values=None) -> Dict[str, 
     return dict_so_far
 
 
+def group_by_function(dataset: List[List], column: int, filter_function, filter_values=None) -> Dict[str, List[List]]:
+    """Group the data by different values of the column <column> applied to the filter_function
+    and return an list with lists of observations for a specific value of the column applied to
+    the filter function.
+
+    @param dataset: the dataset we want to filter
+    @param column: the column number to group by
+    @param filter_function: function to get values from column
+    @param filter_values: set of values for column we want to keep
+    @return: dict containing datasets with different values for the column
+    """
+
+    all_values = [row + [filter_function(row[column])] for row in dataset]
+
+    values_to_keep = unique(all_values, len(dataset[0]))
+
+    if filter_values:
+        values_to_keep = values_to_keep.intersection(filter_values)
+
+    dict_so_far = {value: [] for value in values_to_keep}
+
+    for row in all_values:
+        if row[len(dataset[0])] in dict_so_far:
+            dict_so_far[row[len(dataset[0])]].append(row)
+
+    return dict_so_far
+
+
 def extract_column(dataset: List[List], column: int) -> list:
     """Return a column of a dataset"""
     return [row[column] for row in dataset]
-
