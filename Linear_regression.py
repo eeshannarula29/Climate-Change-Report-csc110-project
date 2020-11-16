@@ -54,9 +54,18 @@ So how do we do this?
 """
 
 
+# for only this files use
 def predict(x: np.array, weights: np.array) -> np.array:
     """Returns the prediction made by the line, by passing
     in the value of x in equation y = theta_1*x + theta_0"""
+    return np.dot(x, weights)
+
+
+# for public use
+def predict_values(x: np.array, weights: np.array) -> np.array:
+    """Returns the prediction made by the line, by passing
+    in the value of x in equation y = theta_1*x + theta_0"""
+    x = np.insert(x, 0, np.array([1]), axis=1)
     return np.dot(x, weights)
 
 
@@ -89,6 +98,12 @@ def train(x: np.array, y: np.array, iterations: int, learning_rate: float) -> li
     :param iterations: number of times we want to train the model on our dataset
     :param learning_rate: the learning  rate of the model
     :return: list containing weights and cost_history
+
+    Preconditions:
+    - x.shape = [no. of rows, no. o columns]
+    - y.shape = [no. of rows, 1]
+    - iterations >= 0
+    - learning rate >= 0
     """
 
     x = np.insert(x, 0, np.array([1]), axis=1)
@@ -157,6 +172,18 @@ def run_demo() -> None:
 
     # plot graphs
     plot_statistics(x, y, weights, history)
+
+    # to predict
+    xs = np.array([[1], [2], [3], [4]])  # array of values for which we want prediction
+    prediction = predict_values(xs, weights)
+
+    print(prediction)
+
+    # if the data u have looks like [1, 2, 3, 4]
+    data = np.array([1, 2, 3, 4])
+    input = data.reshape(data.shape[0], 1)
+
+    print(input)
 
 
 if __name__ == "__main__":
