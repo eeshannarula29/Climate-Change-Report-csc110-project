@@ -8,8 +8,7 @@ Resources:
 """
 
 import matplotlib.pyplot as plt
-from random import uniform
-from typing import List
+import numpy as np
 
 """
 A liner regression mode is a straight line which best describes relation between 
@@ -55,136 +54,86 @@ So how do we do this?
 """
 
 
-def predict(x: float, weight: float, bias: float) -> float:
+def predict(x: np.array, weights: np.array) -> np.array:
     """Returns the prediction made by the line, by passing
     in the value of x in equation y = theta_1*x + theta_0"""
-    return weight * x + bias
+    return np.dot(x, weights)
 
 
-# step1: initialize weights and biases randomly
-def initialize_parameters(minimum, maximum) -> List[float]:
-    """Returns list of two randomly generate numbers
-    in range <min> to <max>
-
-    @param minimum: the least value the numbers in the return list can take
-    @param maximum: the maximum value the numbers in the return list can take
-    """
-    return [uniform(minimum, maximum), uniform(minimum, maximum)]
-
-
-# step2: compute the cost of our weight and bias
-def compute_cost(xs: List[float], ys: List[float], weight: float, bias: float) -> float:
-    """
-    Return the cost of the model by calculating the average squared difference in the
+def cost(x: np.array, y: np.array, weights: np.array) -> np.array:
+    """Return the cost of the model by calculating the average squared difference in the
     predicted and actual values
 
-    @param xs: list of values of predictor variable of our model
-    @param ys: list of values of dependent variable corresponding to the values in xs
-    @param weight: the slope of the model or line
-    @param bias: the intercept of the model or line
+    @param x: array of values of predictor variable of our model
+    @param y: array of values of dependent variable corresponding to the values in x
+    @param weights: array of slope and intercept of the line
     @return: the cost of the model
     """
+    m = x.shape[0]  # total samples in the array
 
-    # compute the average squared difference in the predicted and actual values
-    sq_avg = sum(pow(predict(xs[i], weight, bias) - ys[i], 2)
-                 for i in range(len(xs))) / len(xs)
+    y_hat = predict(x, weights)  # predicted values
 
-    # we return our answer divided by 2 because of computational purposes
-    return sq_avg / 2
+    residual = y_hat - y  # difference in the actual and predicted values
 
-
-# step3 and step 4: compute the gradient which would be used to modify theta_1 and theta_0
-def compute_gradients(xs: List[float], ys: List[float], weight: float, bias: float) -> \
-        List[float]:
-    """ Return the delta weight and bias, with which we can change our current
-    weight and bias to lower the cost function and increase the accuracy of our
-    prediction. These deltas are called gradients and are calculated by computing
-    the partial derivative of the cost function with respect to the weight and bias.
-
-    @param xs: list of values of predictor variable of our model
-    @param ys: list of values of dependent variable corresponding to the values in xs
-    @param weight: weight: the slope of the model or line
-    @param bias: bias: the intercept of the model or line
-    @return: gradients for weight and bias of the line
-    """
-
-    d_bias = sum([(predict(xs[i], weight, bias) - ys[i])
-                  for i in range(len(xs))]) / len(xs)
-
-    d_weight = sum([(predict(xs[i], weight, bias) - ys[i]) * xs[i]
-                    for i in range(len(xs))]) / len(xs)
-
-    return [d_weight, d_bias]
+    return np.sum(np.square(residual)) / (2 * m)
 
 
-# step4: Repeat step 2 to 4, and train our model
-def train(xs: List[float], ys: List[float], epochs: int, alpha: float, minmax: List[int], callback=None) -> list:
+def train(x: np.array, y: np.array, iterations: int, learning_rate: float) -> list:
     """The function would calculate the gradients of the randomly initialized weight and bias
     and change them according to the gradient and the learning rate. This process is repeated
-    <epochs> times, and return the trained weights. The aim is to reduce the cost of these
+    <iterations> times, and return the trained weights. The aim is to reduce the cost of these
     parameters.
 
-    @param xs: list of values of predictor variable of our model
-    @param ys: list of values of dependent variable corresponding to the values in xs
-    @param epochs: The number of times we want to train our model
-    @param alpha: the learning rate with which we want to learn
-    @param minmax: list containing the range of random initial weight and bias: [min, max]
-    @param callback: a function that would be called after every epoch
-    @return: The weight and bias of the trained model, and a list of cost after every epoch
+    :param x: array of values of predictor variable of our model
+    :param y: array of values of dependent variable corresponding to the values in x
+    :param iterations: number of times we want to train the model on our dataset
+    :param learning_rate: the learning  rate of the model
+    :return: list containing weights and cost_history
     """
 
-    # step 1: initialize weights and biases randomly
-    weight, bias = initialize_parameters(minmax[0], minmax[1])
+    x = np.insert(x, 0, np.array([1]), axis=1)
 
-    # step 2 to 4
-    history = []  # contain the cost of the function after every epoch
+    m = x.shape[0]  # total samples in the array
 
-    for _ in range(epochs):
-        # computing the gradients to modify parameters
-        gradients = compute_gradients(xs, ys, weight, bias)
+    weights = np.zeros((x.shape[1], 1))  # initialize weights
 
-        # modifying parameters
-        weight = weight - alpha * gradients[0]
-        bias = bias - alpha * gradients[1]
+    cost_history = []  # will store cost after every epoch
 
-        # cost of the model
-        cost = compute_cost(xs, ys, weight, bias)
+    for _ in range(iterations):
+        y_hat = predict(x, weights)  # predicted values
 
-        history.append(cost)
+        residual = y_hat - y  # difference in the actual and predicted values
 
-        if callback:
-            callback([weight, bias, history])
+        gradient = np.dot(x.T, residual)
 
-    return [weight, bias, history]
+        weights -= (learning_rate / m) * gradient
+
+        cost_history.append(cost(x, y, weights))
+
+    return [weights, np.array(cost_history)]
 
 
-def plot_statistics(xs: List[float], ys: List[float], weight: float, bias: float, history: List[float]) -> None:
+def plot_statistics(x: np.array, y: np.array, weights: np.array, cost_history: np.array) -> None:
     """
     Plot the line and the data-points in one plot and cost on another plot
 
-    @param xs: list of values of predictor variable of our model
-    @param ys: list of values of dependent variable corresponding to the values in xs
-    @param weight: weight of the model
-    @param bias: bias of the model
-    @param history: list of cost per epoch
-    @return: None
+    @param x: array of values of predictor variable of our model
+    @param y: array of values of dependent variable corresponding to the values in x
+    @param weights: array of slope and intercept of line
+    @param cost_history: array of costs of the model after each iteration of training the model
     """
 
-    # plot the data points and line
     plt.figure(1)
-    plt.scatter(xs, ys)
-    plt.xlabel('x')
-    plt.ylabel('y')
+    plt.scatter(x, y)
 
-    predicted_values = [predict(i, weight, bias) for i in xs]
+    xs = np.insert(x, 0, np.array([1]), axis=1)
 
-    plt.plot(xs, predicted_values, color='r')
+    y_hat = np.dot(xs, weights)  # predicted values
 
-    # plot the cost function with epochs
+    plt.plot(x, y_hat, color='r')
+
     plt.figure(2)
-    plt.plot(list(range(len(history))), history)
-    plt.xlabel('epochs')
-    plt.ylabel('cost')
+    plt.plot(range(cost_history.shape[0]), cost_history)
 
     plt.show()
 
@@ -192,29 +141,22 @@ def plot_statistics(xs: List[float], ys: List[float], weight: float, bias: float
 def run_demo() -> None:
     """
     The function would run a demo training session on sample data
-
     :return: None
     """
-
-    import numpy as np
-
     # generating data
-    xs = np.random.rand(100, 1)
-    ys = 2 + 3 * xs + np.random.rand(100, 1)
-
-    # covert to list
-    xs, ys = [i[0] for i in xs], [i[0] for i in ys]
+    np.random.seed(0)
+    x = np.random.rand(100, 1)
+    y = 2 + 3 * x + np.random.rand(100, 1)
 
     # defining attributes to the train function
-    epochs = 1000
-    learning_rate = 0.1
-    initial_range = [-5, 5]
+    iterations = 1000
+    learning_rate = 0.05
 
     # train model
-    slope, intercept, history = train(xs, ys, epochs, learning_rate, initial_range)
+    weights, history = train(x, y, iterations, learning_rate)
 
     # plot graphs
-    plot_statistics(xs, ys, slope, intercept, history)
+    plot_statistics(x, y, weights, history)
 
 
 if __name__ == "__main__":
