@@ -18,7 +18,7 @@ from typing import List
 import csv
 
 
-def read_convert_csv_file(filename: str) -> List[list]:
+def read_convert_all_csv_file(filename: str) -> List[list]:
     """
     Read all the data from csv file and convert it into the required format.
 
@@ -137,6 +137,32 @@ def cleanup(lst: List[list]) -> List[list]:
         else:
             new_lst.append(x)
 
+    new_lst.pop(0)
     return new_lst
 
 
+def final_data(filename: str) -> List[list]:
+    """
+    Transform the "CO2 emissions (kg per PPP $ of GDP)" data of Austria, Brazil, Switzerland,
+    Canada, United States and China for the years 1990 to 2016 inclusive into a list of lists.
+    """
+
+    lst = read_convert_all_csv_file(filename)
+    lst = cleanup(lst)
+    new_lst = []
+
+    for x in lst:
+        if x[0] == 'Austria':
+            new_lst.append(x)
+        if x[0] == 'Brazil':
+            new_lst.append(x)
+        if x[0] == 'Switzerland':
+            new_lst.append(x)
+        if x[0] == 'Canada':
+            new_lst.append(x)
+        if x[0] == 'United States':
+            new_lst.append(x)
+        if x[0] == 'China':
+            new_lst.append(x)
+
+    return new_lst
