@@ -5,6 +5,7 @@ This file will be used to handle all the data
 from datetime import datetime
 from typing import List, Dict
 import csv
+import ast
 
 
 def read_csv(filepath: str) -> List[List[str]]:
@@ -25,7 +26,7 @@ def read_csv(filepath: str) -> List[List[str]]:
         return data
 
 
-def read_csv_and_transform(filepath: str, types: list) -> List[List[str]]:
+def read_csv_and_transform(filepath: str, types: list, year_only: bool = False, day_only: bool = False) -> List[List[str]]:
     """Return a List rows of csv file, where every row
     is a list, with all variables in their respective datatype
 
@@ -39,12 +40,12 @@ def read_csv_and_transform(filepath: str, types: list) -> List[List[str]]:
 
         next(reader)  # skip the header row
 
-        data = [convert_datatype(row, types) for row in reader]
+        data = [convert_datatype(row, types, year_only, day_only) for row in reader]
 
         return data
 
 
-def transform(dataset: List[List], types: list, year_only: bool = False) -> List[List]:
+def transform(dataset: List[List], types: list, year_only: bool = False, only_day: bool = False) -> List[List]:
     """Return a dataset with all the variables in their appropriate
     data type.
 
@@ -53,7 +54,7 @@ def transform(dataset: List[List], types: list, year_only: bool = False) -> List
     :param types: list of datatype objects
     :return: dataset with variables having appropriate datatype
     """
-    return [convert_datatype(row, types, year_only) for row in dataset]
+    return [convert_datatype(row, types, year_only, only_day) for row in dataset]
 
 
 def convert_to_datetime(dt: str) -> datetime:
@@ -67,7 +68,7 @@ def convert_to_datetime(dt: str) -> datetime:
     return datetime.fromisoformat(dt)
 
 
-def convert_datatype(values: list, types: list, only_year: bool = False) -> list:
+def convert_datatype(values: list, types: list, only_year: bool = False, only_day: bool = False) -> list:
     """
     Returns a list with every element of the list converted
     into the appropriate datatype passed in the types.
@@ -91,14 +92,18 @@ def convert_datatype(values: list, types: list, only_year: bool = False) -> list
     list_so_far = []  # ACCUMULATOR: stores the new values
 
     for index in range(len(values)):
-        if types[index] != datetime:
+        if types[index] != datetime and types[index] != list:
             list_so_far.append(types[index](values[index]))
 
-        else:
+        elif types[index] == datetime:
             if only_year:
                 list_so_far.append(convert_to_datetime(values[index]).year)
+            elif only_day:
+                list_so_far.append(convert_to_datetime(values[index]).day)
             else:
                 list_so_far.append(convert_to_datetime(values[index]))
+        elif types[index] == list:
+            list_so_far.append(ast.literal_eval((values[index])))
 
     return list_so_far
 
@@ -232,6 +237,42 @@ def group_by_function(dataset: List[List], column: int, filter_function, filter_
     return dict_so_far
 
 
+def calc_avg_col(dataset: List[List], column: int) -> float:
+    """Return the average for a column
+
+    @param dataset: the dataset for which we want to compute average
+    @param column: the column for which we want the average
+    @return: average of the column <column>
+    """
+    return sum([row[column] for row in dataset]) / len(dataset)
+
+
 def extract_column(dataset: List[List], column: int) -> list:
     """Return a column of a dataset"""
     return [row[column] for row in dataset]
+
+
+def calculate_average(data: List[List], grouping_cloumn: int, avg_column: int, grouping_column_modifier=None) -> List[List]:
+    """The function groups the data by column <grouping column> of the dataset and then calculate
+    the average of column <avg_column> for every group and return the list of those averages and
+    list of values for grouping column
+
+    @param data: dataset for which we want to compute the average
+    @param grouping_cloumn: column with which we would group
+    @param avg_column: the column of which we want to compute average
+    @param grouping_column_modifier: function to group by modified value of the grouping column
+    @return: List containing the average of column <avg_column> for every group of column <grouping_column>
+    """
+    values = []
+    group = []
+
+    if grouping_column_modifier:
+        data = group_by_function(data, grouping_cloumn, grouping_column_modifier)
+    else:
+        data = group_by(data, grouping_cloumn)
+
+    for i in data:
+        values.append(calc_avg_col(data[i], avg_column))
+        group.append(data[i][0][grouping_cloumn])
+
+    return [group, values]
