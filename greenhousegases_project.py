@@ -1,11 +1,9 @@
 """This file is used for the visualization of the trends in Greenhouse Gases
 and carbon emissions.
-
 Resources:
 - https://www.geeksforgeeks.org/box-plot-in-python-using-matplotlib/
 - https://www.kite.com/python/answers/how-to-color-a-scatter-plot-by-category-using-matplotlib-in-python
 - https://plotly.com/python/box-plots/
-
 TODO:
 - check for wrong country labels on the graph
 - remove "using read_csv..." from the docstrings
@@ -29,7 +27,6 @@ def data_by_tags_and_country_or_year(filepath: str,
     covert every variable in the row into its appropriate datatype and then filter out the data
     containing only the tags we want, and only for the countries or years we want, and then return emission values
     separately for all the countries or years.
-
     @param filepath: the path of the dataset
     @param tags: list of all the categories of emissions we want in the data
     @param countries_or_years: The countries or years for which we want the data
@@ -64,9 +61,7 @@ def data_by_tags(filepath: str,
     covert every variable in the row into its appropriate datatype and then filter out the data
     containing only the tags we want, and return the emission values along side the respective
     country and year.
-
-    We can pass in optional lists to only get rows with specific coutry or year
-
+    We can pass in optional lists to only get rows with specific country or year
     @param filepath: the path of the dataset
     @param tags: list of all the categories of emissions we want in the data
     @param country_filter: list of countries we want data for
@@ -96,21 +91,23 @@ def data_by_tags(filepath: str,
 
 # Plot1
 def plot_csv_data_boxplot_co2(filepath: str) -> None:
-    """Uses read_csv_data_boxplot_co2() to read data and plots two
-    boxplots showing amount of carbon dioxide (CO2) emissions (million
-    tonnes) in USA and the European Union over all the years (from 1990
-    to 2014)
+    """Plots two boxplots showing amount of carbon dioxide (CO2) emissions (million tonnes) in USA and the
+    European Union over all the years (from 1990 to 2014).
+    It aggregates data of all years from dataset and compares median, Inter quartile range(IQR), first quartile and
+    third  quartile values of emission levels in the USA and the EU.
+    @param filepath: the path of the dataset
     """
     countries = ['United States of America', 'European Union']
 
-    tags = ['carbon_dioxide_co2_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
+    tags = [
+        'carbon_dioxide_co2_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
 
     data = data_by_tags_and_country_or_year(filepath, tags, countries, 0)
 
     x1 = np.array(data[0])  # value of CO2 emissions in the USA
     x2 = np.array(data[1])  # value of CO2 emissions in the EU
 
-    plt.boxplot((x1, x2), notch=False, sym="o", labels=["America", "European Union"])
+    plt.boxplot((x1, x2), notch=False, sym="o", labels=["United States of America", "European Union"])
 
     plt.xlabel("Region/Country", fontsize=15)
     plt.ylabel("Aggregated Emissions of Gases (in million kilotonnes) from 1990 - 2014 ", fontsize=9)
@@ -120,18 +117,24 @@ def plot_csv_data_boxplot_co2(filepath: str) -> None:
 
 # Plot2
 def plot_csv_data_notched_boxplot_ghgs(filepath: str) -> None:
-    """Uses read_csv_data_notched_boxplot_ghgs() to read data and
-    plots 2 notched boxplots showing amount of greenhouse gas emissions
-    (ghgs) (kilotonnes) in Canada and France over all the years (from 1990 to 2014)
+    """Plots 2 notched boxplots showing amount of greenhouse gas emissions (ghgs) (kilotonnes) in Canada and France over
+     all the years (from 1990 to 2014).
+    This compares greenhouse gas emissions by 2 countries that have varying demographic and geographic conditions.
+    (France - Less geographical area, More densely populated,
+    Canada - Low density of population, very large geographical area)
+    @param filepath: the path of the dataset
     """
 
     countries = ['Canada', 'France']
 
-    tags = ['greenhouse_gas_ghgs_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
+    tags = [
+        'greenhouse_gas_ghgs_emissions_without_land_use_land_use_change_and_'
+        'forestry_lulucf_in_kilotonne_co2_equivalent']
 
     data = data_by_tags_and_country_or_year(filepath, tags, countries, 0)
+    print(data)
 
-    x1 = np.array(data[0])  # value of greenhouse gas emissions in the USA
+    x1 = np.array(data[0])  # value of greenhouse gas emissions in the Canada
     x2 = np.array(data[1])  # value of greenhouse gas emissions in France
 
     plt.boxplot((x1, x2), notch=True, sym="o", labels=["Canada", "France"])
@@ -144,10 +147,12 @@ def plot_csv_data_notched_boxplot_ghgs(filepath: str) -> None:
 
 # Plot3
 def plot_all_countries_data_peryear_boxplot(filepath: str) -> None:
-    """ Uses read_csv_data_boxplot_all_countries_year() to read data
-    and plots 5 boxplots showing amount of nitrogen triflouride (NF3)
+    """ Plots 5 boxplots showing amount of nitrogen triflouride (NF3)
     emissions (kilotonnes) in all countries taken together over the
-    years 2010, 2011, 2012, 2013 and 2014
+    years 2010, 2011, 2012, 2013 and 2014.
+    Through this visualization, it is easier to understand correlation of how increased development
+    (leading to large scale deforestation etc) has affected carbon dioxide emissions in recent years.
+    @param filepath: the path of the dataset
     """
 
     years = [2010, 2011, 2012, 2013, 2014]
@@ -170,15 +175,17 @@ def plot_all_countries_data_peryear_boxplot(filepath: str) -> None:
 
 # Plot4
 def plot_csv_data_scatter_co2(filepath: str) -> None:
-    """Uses read_csv_data_scatter_co2() to read data and it
-    plots a scatterplot showing amount of carbon dioxide (CO2)
-    emissions (kilotonnes) in USA, Canada and the European Union
-    each year (between 1990 and 2014)
+    """Plots a scatterplot showing amount of carbon dioxide (CO2) emissions (kilotonnes) in USA, Canada and
+    the European Union each year (between 1990 and 2014).
+    This helps us to understand trends of carbon dioxide emissions in 3 countries with very different demographics.
+    (Canada - Low population Density, EU - Higher Population Density, USA - Large scale industrialization)
+    @param filepath: the path of the dataset
     """
 
     countries = ['Canada', 'United States of America', 'European Union']
 
-    tags = ['carbon_dioxide_co2_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
+    tags = [
+        'carbon_dioxide_co2_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
 
     data = data_by_tags(filepath, tags, country_filter=countries)
 
@@ -202,21 +209,24 @@ def plot_csv_data_scatter_co2(filepath: str) -> None:
 
 # Plot5
 def plot_csv_data_scatter_n2o(filepath: str) -> None:
-    """Uses read_csv_data_scatter_n2o() to read data and plots
-    a scatterplot showing amount of nitrous oxide (N2O) emissions
+    """Plots a scatterplot showing amount of nitrous oxide (N2O) emissions
     (kilotonnes) in USA, Canada and the European Union each year
-    (between 1990 and 2014)
+    (between 1990 and 2014).
+    This helps us to understand trends of nitrous oxide emissions in 3 countries with very different demographics.
+    (Canada - Low population Density, EU - Higher Population Density, USA - Large scale industrialization)
+    @param filepath: the path of the dataset
     """
 
     countries = ['Canada', 'United States of America', 'European Union']
 
-    tags = ['nitrous_oxide_n2o_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
+    tags = [
+        'nitrous_oxide_n2o_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
 
     data = data_by_tags(filepath, tags, country_filter=countries)
 
     y = data[0]  # emission data
     labels = data[1]  # list of countries
-    x = data[2] # list of years
+    x = data[2]  # list of years
 
     data = pd.DataFrame({"X Value": x, "Y Value": y, "Category": labels})
 
@@ -234,19 +244,21 @@ def plot_csv_data_scatter_n2o(filepath: str) -> None:
 
 # Plot6
 def plot_csv_data_plotly_scatterboxplot_sparsely_pop(filepath: str) -> None:
-    """ Uses read_csv_data_plotly_scatter_boxplot() to read data and plots a
-    scatterplot and a box plot together showing distribution of amount of carbon
-    dioxide (CO2) emissions (kilotonnes) in Austria, Belarus and Bulgaria in the
-    24 year period (between 1990 and 2014). The scatterplot shows each year's
-    emissions data for the 3 aforementioned countries and the boxplot aggregates
+    """ Plots a scatterplot and a box plot together showing distribution of amount of carbon
+    dioxide (CO2) emissions (kilotonnes) in Austria, Belarus and Bulgaria in the 24 year period (between 1990 and 2014).
+    This plot studies and visualizes details of total carbon dioxide emissions
+    in sparsely populated countries.
+    The scatterplot shows each year's emissions data for the 3 aforementioned countries and the boxplot aggregates
     and visualizes this data.
+    @param filepath: the path of the dataset
     """
 
     import plotly.graph_objects as go
 
     countries = ['Austria', 'Belarus', 'Bulgaria']
 
-    tags = ['carbon_dioxide_co2_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
+    tags = [
+        'carbon_dioxide_co2_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
 
     data = data_by_tags_and_country_or_year(filepath, tags, countries, 0)
 
@@ -289,11 +301,14 @@ def plot_csv_data_plotly_scatterboxplot_sparsely_pop(filepath: str) -> None:
 
 # Plot7
 def plot_csv_data_scatter_boxplot_1990_2014(filepath: str) -> None:
-    """Uses read_csv_data_plotly_scatter_boxplot_1990_2014() to read data
-    and plots a scatterplot and a box plot together showing distribution of
+    """Plots a scatterplot and a box plot together showing distribution of
     hydrofluorocarbon (hfcs) emissions in 1990, 2002 and 2014 (in all countries
-    taken together). The scatterplot shows each country's emissions data for the
-    3 aforementioned years and the boxplot aggregates and visualizes this data.
+    taken together).
+    This tells us about trends of changes in hydroflourocarbon emissions in 1990, 2002 and 2014.
+    This helps to correlate increased industrialization over the years with release of more pollutants.
+    The scatterplot shows each country's emissions data for the 3 aforementioned years and the boxplot aggregates
+    and visualizes this data.
+    @param filepath: the path of the dataset
     """
     import plotly.graph_objects as go
 
@@ -325,7 +340,8 @@ def plot_csv_data_scatter_boxplot_1990_2014(filepath: str) -> None:
         )
 
     fig.update_layout(
-        title='Hydrofluorocarbon (hfcs) Emissions in kilotonnes by all countries (aggregated together) for 1990, 2002, 2014 ',
+        title='Hydrofluorocarbon (hfcs) Emissions in kilotonnes by all countries (aggregated together) '
+              'for 1990, 2002, 2014 ',
         margin=dict(
             l=40,
             r=30,
@@ -342,11 +358,12 @@ def plot_csv_data_scatter_boxplot_1990_2014(filepath: str) -> None:
 
 # Plot8
 def plot_csv_data_bargraph(filepath: str) -> None:
-    """Uses read_csv_data_bargraph() to read data and plots a grouped
-    bargraph with methane emissions in the European Union and France.
-    It also shows the methane emissions inthe European Union minus
-    those from France. The bargraph resulting from this function shows
-    data for years 1990 -2014.
+    """Plots a grouped bargraph with methane emissions in the European Union and France.
+    It shows the the amount of emissions that France (a aprt of the EU) accounts for and the total emissions from all
+    other EU countries put together minus emissions released by France.
+    It basically gives us a rough estimate of percentage of EU emissions that France accounts for.
+    The bargraph shows data for years 1990 - 2014.
+    @param filepath: the path of the dataset
     """
 
     countries = ['European Union', 'France']
@@ -354,11 +371,12 @@ def plot_csv_data_bargraph(filepath: str) -> None:
     tags = ['methane_ch4_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
 
     data = data_by_tags_and_country_or_year(filepath, tags, countries, 0)
-    years = [x for x in range(1990, 2014)]
+    years = [2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007, 2006, 2005, 2004, 2003, 2002, 2001, 2000, 1999, 1998, 1997,
+             1996, 1995, 1994, 1993, 1992, 1991, 1990]
 
     fig = go.Figure(data=[
-        go.Bar(name='Methane emissions in France ', x=years, y=data[0]),
-        go.Bar(name='Methane emissions in the EU other than France', x=years, y=data[1]),
+        go.Bar(name='Methane emissions in France ', x=years, y=data[1]),
+        go.Bar(name='Methane emissions in the EU other than France', x=years, y=data[0]),
 
     ])
     title = f' Model: Methane emissions of France in comparison with Methane emissions of the European Union ' \
@@ -368,3 +386,40 @@ def plot_csv_data_bargraph(filepath: str) -> None:
                       xaxis_title='Years',
                       yaxis_title='Methane Emissions (in kilotonnes)')
     fig.show()
+
+
+from linear_regression import train
+from linear_regression import plot_statistics
+from linear_regression import predict_values
+
+
+def australia_data_prediction(filepath: str) -> np.array:
+    """
+    Use linear regresion model to predict the levels of methane emissions in years 2015, 2016, 2017 from data of methane
+     emissions from 1990 - 2014.
+    """
+    countries = ['Australia']
+    tags = ['methane_ch4_emissions_without_land_use_land_use_change_and_forestry_lulucf_in_kilotonne_co2_equivalent']
+    data = data_by_tags(filepath, tags, country_filter=countries)
+    y_axis_data = data[0]
+    data_y = np.array(y_axis_data)
+    # y_axis_data = np.round(np.array(data[0]))
+    x_axis_data = np.array(range(data_y.shape[0]))
+
+    iterations = 2000
+    learning_rate = 0.01
+
+    # converting list data to numpy
+    input_x = x_axis_data.reshape(x_axis_data.shape[0], 1)
+    input_y = data_y.reshape(data_y.shape[0], 1)
+    input_y = np.flip(input_y)
+    # train model
+    weights, history = train(input_x, input_y, iterations, learning_rate)
+    plot_statistics(input_x, input_y, weights, history)
+    years = np.array([25, 26, 27])  # predictions of year 2015, 2016, 2017 (1990 + 25, 1990 + 26, 1990 + 27)
+    input_years = years.reshape(years.shape[0], 1)
+    prediction_australia = predict_values(input_years, weights)
+    return prediction_australia
+
+
+
