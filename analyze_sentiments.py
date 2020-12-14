@@ -3,14 +3,11 @@ This file is used to create a dataset similar to
 the tweeter data we already have but with an extra
 column for the sentiment score of the tweet, based
 on dataset of collection of words we have
-
-References:
-
 """
 
 # import libraries
 from datetime import datetime
-from typing import Dict
+from typing import Dict, Tuple
 import csv
 import ast
 
@@ -32,7 +29,7 @@ def add_sentiments_to_data(filename: str, words_list: str) -> None:
 
     # extracting the tweet text out of the data
     with open(filename, 'r') as input_file:
-        with open('dataset/climate-change-sentiment.csv', 'w') as output_file:
+        with open('datasets/twitter/climate-change-sentiment.csv', 'w') as output_file:
             reader = csv.reader(input_file)
             writer = csv.writer(output_file)
 
@@ -42,6 +39,7 @@ def add_sentiments_to_data(filename: str, words_list: str) -> None:
 
             writer.writerow(['tweet_text',  # text of the tweet
                              'senti-score',  # sentiment score of the tweet
+                             'senti-type',  # neutral, positive or negative
                              'all_hashtags',  # list of all the hashtags in the tweet
                              'favorite_count',  # number of likes to the tweet
                              'retweet_count',  # number of times the tweet was retweeted
@@ -51,8 +49,10 @@ def add_sentiments_to_data(filename: str, words_list: str) -> None:
                              'location'])  # the location of the user
 
             for row in reader:
+                score, tag = analyze_sentiments(row[0], words)
                 writer.writerow([row[0],
-                                 analyze_sentiments(row[0], words),
+                                 score,
+                                 tag,
                                  ast.literal_eval(row[1]),
                                  int(row[2]),
                                  int(row[3]),
@@ -85,7 +85,11 @@ def extract_words(filename: str) -> Dict[str, float]:
 
     # extracting the file
     with open(filename) as file:
-        reader = [line for line in file.read().split('\n') if line != '' and line[0] != '#']
+        reader = []
+
+        for line in file.read().split('\n'):
+            if line != '' and line[0] != '#':
+                reader.append(line)
 
         words_so_far = {}  # ACCUMULATOR: stores the return data
 
@@ -100,7 +104,7 @@ def extract_words(filename: str) -> Dict[str, float]:
         return words_so_far
 
 
-def analyze_sentiments(tweet_txt: str, words_list: Dict[str, float]) -> float:
+def analyze_sentiments(tweet_txt: str, words_list: Dict[str, float]) -> Tuple[float, str]:
     """ Returns a sentiment score for the tweet by adding up the score of all
     the words it contains which are in the words list.
 
@@ -114,20 +118,40 @@ def analyze_sentiments(tweet_txt: str, words_list: Dict[str, float]) -> float:
     """
 
     # remove neutral words from the list as they don't impact the sentiments
-    refined_list = {word: words_list[word] for word in words_list if words_list[word] != 0}
+    refined_list = {}
+
+    for word in words_list:
+        if words_list[word] != 0:
+            refined_list[word] = words_list[word]
 
     # our words in the refined_list are only lowe-case  so we have to covert
     # the tweet into all lower-case.
     text = str.lower(tweet_txt)
 
     score_so_far = 0.0  # ACCUMULATOR: stores the sentiment score
+    tag = 'neutral'
 
     for word in text.split():
         if word in refined_list:
             score_so_far += refined_list[word]
 
-    return score_so_far
+    if score_so_far >= .5:
+        tag = 'positive'
+    elif score_so_far <= -.25:
+        tag = 'negative'
+
+    return (score_so_far, tag)
 
 
 if __name__ == '__main__':
-    add_sentiments_to_data('dataset/climate-change.csv', 'dataset/SentiWords_1.1.txt')
+    import python_ta
+
+    python_ta.check_all(config={
+        'extra-imports': ['datetime',
+                          'csv',
+                          'ast',
+                          'typing'],
+        'allowed-io': ['add_sentiments_to_data', 'extract_words'],
+        'max-line-length': 150,
+        'disable': ['R1705', 'C0200']
+    })

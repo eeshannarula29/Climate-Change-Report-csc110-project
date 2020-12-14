@@ -10,49 +10,6 @@ Resources:
 import matplotlib.pyplot as plt
 import numpy as np
 
-"""
-A liner regression mode is a straight line which best describes relation between 
-variables. The model can be trained in two ways, with maths or machine learning 
-technique called gradient decent. We would use gradient decent and matrices to 
-find the line of best fit.
-
-The equation of line can be denoted by y = mx + b, where y is the variable we want to 
-predict and x predictor variable used to predict variable y. m is the slope and b is the
-bias or intercept of that line. 
-
-In machine learning terminology this slope m is denoted by theta 1 and is called the weight, 
-and the intercept b is called the bias and denote by theta 0. we want to compute these 
-parameters of the line. 
-
-So how do we do this?
-
-1) first we initialize our weights and biases randomly. 
-
-2) then we compute the cost of those weights and biases, which is the 
-   average squared difference in the predicted and actual values of our
-   dataset. 
-
-3) our aim is to reduce this cost, by changing the values of the weights 
-   and biases
-   
-4) This is done by the use of gradient decent formula, where we compute 
-   the partial derivative of the cost function which respect to theta 1
-   to modify theta 1 and with respect to theta 0 to modify theta 0. The 
-   value we just calculate multiplied by alpha, is the number we would 
-   change our weights and bias by. 
-   
-   here alpha is the learning rate which prevents everything from being 
-   to large, and keeps everything in bound. 
-   
-5) we repeat step 2 to 5 multiple times, to get a line of best fit. the 
-   number of times we repeat step 2 to step 5 is called the number of 
-   epochs.    
-   
-*  A very low learning rate can take the model too many epochs to learn, 
-   and too high value of learning rate wont let the learn, and instead can
-   make it worse with time. 
-"""
-
 
 # for only this files use
 def predict(x: np.array, weights: np.array) -> np.array:
@@ -93,11 +50,11 @@ def train(x: np.array, y: np.array, iterations: int, learning_rate: float) -> li
     <iterations> times, and return the trained weights. The aim is to reduce the cost of these
     parameters.
 
-    :param x: array of values of predictor variable of our model
-    :param y: array of values of dependent variable corresponding to the values in x
-    :param iterations: number of times we want to train the model on our dataset
-    :param learning_rate: the learning  rate of the model
-    :return: list containing weights and cost_history
+    @param x: array of values of predictor variable of our model
+    @param y: array of values of dependent variable corresponding to the values in x
+    @param iterations: number of times we want to train the model on our dataset
+    @param learning_rate: the learning  rate of the model
+    @return: list containing weights and cost_history
 
     Preconditions:
     - x.shape = [no. of rows, no. o columns]
@@ -128,7 +85,7 @@ def train(x: np.array, y: np.array, iterations: int, learning_rate: float) -> li
     return [weights, np.array(cost_history)]
 
 
-def plot_statistics(x: np.array, y: np.array, weights: np.array, cost_history: np.array) -> None:
+def plot_statistics(x: np.array, y: np.array, weights: np.array, cost_history: np.array, reg_line: bool = False) -> None:
     """
     Plot the line and the data-points in one plot and cost on another plot
 
@@ -136,55 +93,35 @@ def plot_statistics(x: np.array, y: np.array, weights: np.array, cost_history: n
     @param y: array of values of dependent variable corresponding to the values in x
     @param weights: array of slope and intercept of line
     @param cost_history: array of costs of the model after each iteration of training the model
+    @param reg_line: if we want to draw a regression line
     """
 
-    plt.figure(1)
-    plt.scatter(x, y)
+    if reg_line:
+        plt.figure(1)
+        plt.scatter(x, y)
 
-    xs = np.insert(x, 0, np.array([1]), axis=1)
+        xs = np.insert(x, 0, np.array([1]), axis=1)
 
-    y_hat = np.dot(xs, weights)  # predicted values
+        y_hat = np.dot(xs, weights)  # predicted values
 
-    plt.plot(x, y_hat, color='r')
+        plt.plot(x, y_hat, color='r')
 
     plt.figure(2)
     plt.plot(range(cost_history.shape[0]), cost_history)
+    plt.title("Cost graph",
+              fontsize=10,
+              fontweight="bold")
 
     plt.show()
 
 
-def run_demo() -> None:
-    """
-    The function would run a demo training session on sample data
-    :return: None
-    """
-    # generating data
-    np.random.seed(0)
-    x = np.random.rand(100, 1)
-    y = 2 + 3 * x + np.random.rand(100, 1)
+if __name__ == '__main__':
+    import python_ta
 
-    # defining attributes to the train function
-    iterations = 1000
-    learning_rate = 0.05
-
-    # train model
-    weights, history = train(x, y, iterations, learning_rate)
-
-    # plot graphs
-    plot_statistics(x, y, weights, history)
-
-    # to predict
-    xs = np.array([[1], [2], [3], [4]])  # array of values for which we want prediction
-    prediction = predict_values(xs, weights)
-
-    print(prediction)
-
-    # if the data u have looks like [1, 2, 3, 4]
-    data = np.array([1, 2, 3, 4])
-    input = data.reshape(data.shape[0], 1)
-
-    print(input)
-
-
-if __name__ == "__main__":
-    run_demo()
+    python_ta.check_all(config={
+        'extra-imports': ['matplotlib.pyplot',
+                          'numpy'],
+        'allowed-io': [],
+        'max-line-length': 150,
+        'disable': ['R1705', 'C0200']
+    })

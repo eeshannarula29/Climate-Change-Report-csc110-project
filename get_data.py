@@ -10,32 +10,11 @@ References:
 - http://docs.tweepy.org/en/v3.5.0/api.html#tweepy-api-twitter-api-wrapper
 """
 
-
-import tweepy  # for getting tweets
 import csv  # for storing the data
-from typing import List  # for better annotation
-
-"""keys required to authenticate that we are valid users
-these are provided by twitter API, when we create a project/App"""
-
-keys = {'consumer_key': 'oYpwnrbV5Y9ALcdwdQhRkSsLR',
-        'consumer_key_secret': 'HHF5PMHys5oFfUeqFgKJIZRwkq0vyWl0mKyBaU3zIFyAV2GCMO',
-        'Access_token': '1323930219263135745-exoYkKfak1aosBU0eVDWTzxW1AFAjo',
-        'Access_token_secret': 'ilX1qD8VROXJh9CG7ow5OPJG2wnPXxpmuWTlXYAAHAyVF'}
-
-tags = ['#climatechange',
-        '#climatechangeisreal',
-        '#actonclimate'
-        '#globalwarming',
-        '#climatechangehoax',
-        '#climatedeniers',
-        '#climatechangeisfalse',
-        '#globalwarminghoax',
-        '#climatechangenotreal']
+import tweepy  # for getting tweets
 
 
-def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: str, access_token_secret: str,
-                     hashtags: List[str], max_items: int) -> None:
+def search_for_query(max_items: int, path: str) -> None:
     """
     This function will get us the most recant <items> tweets on the hashtags we give the function in the form of
     a search query. Here we use the tweepy api to extract these tweets and write all these tweets on csv. We can
@@ -43,12 +22,8 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
     tweet, followers count of that user, location if mentioned and many more, but we would only extract a few of
     them.
 
-    @param consumer_key: A unique key for our project/app assigned by twitter for authentication
-    @param consumer_key_secret: A unique key for our project/app assigned by twitter for authentication
-    @param access_token: A unique key for our project/app assigned by twitter for authentication
-    @param access_token_secret: A unique key for our project/app assigned by twitter for authentication
-    @param hashtags: A list of strings containing all the hashtags for which we want to get tweets
     @param max_items: The maximum number of tweets we want starting from the most latest tweet
+    @param path: path/name of the csv file
     @return: None
 
     Preconditions:
@@ -58,6 +33,20 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
     - access_token_secret is a valid twitter secret access token
     - items > 0
     """
+    consumer_key = 'oYpwnrbV5Y9ALcdwdQhRkSsLR'
+    consumer_key_secret = 'HHF5PMHys5oFfUeqFgKJIZRwkq0vyWl0mKyBaU3zIFyAV2GCMO'
+    access_token = '1323930219263135745-exoYkKfak1aosBU0eVDWTzxW1AFAjo'
+    access_token_secret = 'ilX1qD8VROXJh9CG7ow5OPJG2wnPXxpmuWTlXYAAHAyVF'
+
+    tags = ['#climatechange',
+            '#climatechangeisreal',
+            '#actonclimate'
+            '#globalwarming',
+            '#climatechangehoax',
+            '#climatedeniers',
+            '#climatechangeisfalse',
+            '#globalwarminghoax',
+            '#climatechangenotreal']
 
     # using tweepy to authenticate for accessing twitter
     auth = tweepy.OAuthHandler(consumer_key, consumer_key_secret)
@@ -66,10 +55,7 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
     # initializing API used to do access all the function in the library
     api = tweepy.API(auth, wait_on_rate_limit=True)
 
-    # creating the file to store data in
-    filename = 'dataset/climate-change.csv'
-
-    with open(filename, 'w', newline='') as file:
+    with open(path, 'w', newline='') as file:
         write = csv.writer(file)
 
         # add column names, as the first row of the dataset we would create
@@ -92,35 +78,34 @@ def search_for_query(consumer_key: str, consumer_key_secret: str, access_token: 
         # "tweppy.Coursor" function in which we could specify the number of tweets we want and it would automatically
         # change the page.
 
-        # defining attribute values
-        search_query = ' AND '.join(hashtags) + ' -filter:retweets'  # here '-filter:retweets' would filter out retweets
-        language = 'en'  # the language we want our tweets to be in
-        mode = 'extended'  # mode tells us if we want only the default feature or more feature of a tweet
+        for hashtag in tags:
+            # extracting tweets in a list.
+            # tweets here is a list of tweet objects which contains all the information about a tweet
+            tweets = tweepy.Cursor(api.search, q=hashtag + ' -filter:retweets', lang='en', tweet_mode='extended').items(
+                max_items)
 
-        # extracting tweets in a list.
-        # tweets here is a list of tweet objects which contains all the information about a tweet
-        tweets = tweepy.Cursor(api.search, q=search_query, lang=language, tweet_mode=mode).items(max_items)
-
-        # extracting out the features we want from the tweets and writing them into csv file
-        for tweet in tweets:
-            write.writerow([
-                tweet.full_text.replace('\n', ' '),  # the text of the tweet in one line rather than multiple lines
-                tweet.entities.get('hashtags'),  # list of dicts where each dict contains info about a sing hashtag
-                tweet.favorite_count,  # number of likes on the tweet
-                tweet.retweet_count,  # number of times this tweet has been retweeted
-                tweet.created_at,  # the date and time of creation
-                tweet.user.screen_name,  # username of the user
-                tweet.user.followers_count,  # number of followers the user has
-                tweet.user.location  # location of the user
-            ])
+            # extracting out the features we want from the tweets and writing them into csv file
+            for tweet in tweets:
+                write.writerow([
+                    tweet.full_text.replace('\n', ' '),  # the text of the tweet in one line rather than multiple lines
+                    tweet.entities.get('hashtags'),  # list of dicts where each dict contains info about a sing hashtag
+                    tweet.favorite_count,  # number of likes on the tweet
+                    tweet.retweet_count,  # number of times this tweet has been retweeted
+                    tweet.created_at,  # the date and time of creation
+                    tweet.user.screen_name,  # username of the user
+                    tweet.user.followers_count,  # number of followers the user has
+                    tweet.user.location  # location of the user
+                ])
 
 
 if __name__ == '__main__':
+    import python_ta
 
-    search_for_query(consumer_key=keys['consumer_key'],
-                     consumer_key_secret=keys['consumer_key_secret'],
-                     access_token=keys['Access_token'],
-                     access_token_secret=keys['Access_token_secret'],
-                     hashtags=tags,
-                     max_items=3000)
-
+    python_ta.check_all(config={
+        'extra-imports': ['tweepy',
+                          'csv',
+                          'typing'],
+        'allowed-io': ['search_for_query'],
+        'max-line-length': 150,
+        'disable': ['R1705', 'C0200']
+    })
