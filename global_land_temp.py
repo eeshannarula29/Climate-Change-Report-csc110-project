@@ -91,7 +91,7 @@ def plot_data_greater_average(filepath: str) -> None:
 
    @param filepath: path of the dataset
    """
-    countries = ['United States', 'India', 'China', 'Russia']
+    countries = ['Brazil', 'India', 'China', 'Australia']
     country_average = list(get_avg_by_country(filepath, countries).values())
 
     colors = ['#ff9999', '#66b3ff', '#99ff99', '#ffcc99']
